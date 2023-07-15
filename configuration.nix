@@ -8,16 +8,31 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      <nixpkgs/nixos/modules/profiles/hardened.nix>
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # boot.kernelModules = [ 
+  #   "msr" # msr needed for powertop
+  #   "cpufreq_conservative"
+  #   "cpufreq_powersave"
+  #   "cpufreq_ondemand"
+  #   "cpufreq_userspace"
+  # ]; 
+
   # Setup keyfile
   boot.initrd.secrets = {
     "/crypto_keyfile.bin" = null;
   };
+
+  # https://discourse.nixos.org/t/solved-nohibernate-option-added-to-kernelparams-and-i-dont-know-where-it-comes-from/20611/3
+  security.unprivilegedUsernsClone = true; # needed for chrome sandboxing
+  
+  # allow hyptherthreading
+  security.allowSimultaneousMultithreading = true;
 
   # Enable swap on luks
   boot.initrd.luks.devices."luks-bb94a886-b23a-4f0e-8a06-1bce00dfdd65".device = "/dev/disk/by-uuid/bb94a886-b23a-4f0e-8a06-1bce00dfdd65";
@@ -95,14 +110,20 @@
   users.users.joseph = {
     isNormalUser = true;
     description = "Joseph Siddall";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
+      chromium
       firefox
       google-chrome
       thunderbird
       vscode
     ];
   };
+
+  programs.steam = {
+	enable = true;
+  };
+
 
 
   # Allow unfree packages
@@ -113,9 +134,28 @@
   environment.systemPackages = with pkgs; [
     vim
     git
+    gnomeExtensions.gesture-improvements
+    gnomeExtensions.appindicator
+    usbutils
+    pciutils
+    # fprintd
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
+
+  # services.fwupd.enable = true;
+
+
+  # fingerprint idea: https://github.com/uunicorn/python-validity
+
+  # services.fprintd = {
+  #   enable = true;
+  #   package = pkgs.fprintd-tod;
+  #   tod = {
+  #     enable = true;
+  #     driver = pkgs.libfprint-2-tod1-goodix;
+  #   };
+  # };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -145,5 +185,8 @@
   system.stateVersion = "23.05"; # Did you read the comment?
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
+
+  virtualisation.docker.enable = false;
+  
 
 }
