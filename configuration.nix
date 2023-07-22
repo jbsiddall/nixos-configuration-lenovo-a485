@@ -8,12 +8,12 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      <nixpkgs/nixos/modules/profiles/hardened.nix>
     ];
 
   hardware.bluetooth.enable = true;
 
   # Bootloader.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -29,12 +29,6 @@
   boot.initrd.secrets = {
     "/crypto_keyfile.bin" = null;
   };
-
-  # https://discourse.nixos.org/t/solved-nohibernate-option-added-to-kernelparams-and-i-dont-know-where-it-comes-from/20611/3
-  security.unprivilegedUsernsClone = true; # needed for chrome sandboxing
-  
-  # allow hyptherthreading
-  security.allowSimultaneousMultithreading = true;
 
   # Enable swap on luks
   boot.initrd.luks.devices."luks-bb94a886-b23a-4f0e-8a06-1bce00dfdd65".device = "/dev/disk/by-uuid/bb94a886-b23a-4f0e-8a06-1bce00dfdd65";
@@ -133,6 +127,7 @@
       nodePackages.pnpm
       zoom-us
       telegram-desktop
+      powertop
     ];
   };
 
