@@ -11,6 +11,8 @@
       <nixpkgs/nixos/modules/profiles/hardened.nix>
     ];
 
+  hardware.bluetooth.enable = true;
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -70,8 +72,8 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
   services.xserver.xkbOptions = "ctrl:swapcaps"; 
 
   # Configure keymap in X11
@@ -87,7 +89,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
+  sound.enable = false;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -101,6 +103,16 @@
     # use the example session manager (no others are packaged yet so this is enabled by default,
     # no need to redefine it in your config for now)
     #media-session.enable = true;
+  };
+  environment.etc = {
+	  "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
+		  bluez_monitor.properties = {
+			  ["bluez5.enable-sbc-xq"] = true,
+			  ["bluez5.enable-msbc"] = true,
+			  ["bluez5.enable-hw-volume"] = true,
+			  ["bluez5.headset-roles"] = "[ hsp_hs hsp_ag hfp_hf hfp_ag ]"
+		  }
+	  '';
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -117,6 +129,10 @@
       google-chrome
       thunderbird
       vscode
+      pkgs.nodejs_18
+      nodePackages.pnpm
+      zoom-us
+      telegram-desktop
     ];
   };
 
@@ -134,16 +150,13 @@
   environment.systemPackages = with pkgs; [
     vim
     git
-    gnomeExtensions.gesture-improvements
-    gnomeExtensions.appindicator
     usbutils
     pciutils
+    plasma-browser-integration
     # fprintd
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
-
-  # services.fwupd.enable = true;
 
 
   # fingerprint idea: https://github.com/uunicorn/python-validity
@@ -187,6 +200,4 @@
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   virtualisation.docker.enable = false;
-  
-
 }
