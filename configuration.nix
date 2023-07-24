@@ -67,6 +67,8 @@
 
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager.defaultSession = "plasmawayland";
+
   services.xserver.desktopManager.plasma5.enable = true;
   services.xserver.xkbOptions = "ctrl:swapcaps"; 
 
@@ -128,13 +130,14 @@
       zoom-us
       telegram-desktop
       powertop
+      # openvpn
+      plasma-browser-integration
     ];
   };
 
   programs.steam = {
 	enable = true;
   };
-
 
 
   # Allow unfree packages
@@ -147,7 +150,7 @@
     git
     usbutils
     pciutils
-    plasma-browser-integration
+    virt-manager
     # fprintd
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
@@ -193,6 +196,12 @@
   system.stateVersion = "23.05"; # Did you read the comment?
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
 
-  virtualisation.docker.enable = false;
+  virtualisation.libvirtd.enable = true;
+
 }
