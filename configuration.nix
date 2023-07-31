@@ -17,6 +17,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  boot.kernelModules = [ 
+	"kvm_amd"
+  ];
   # boot.kernelModules = [ 
   #   "msr" # msr needed for powertop
   #   "cpufreq_conservative"
@@ -67,8 +70,6 @@
 
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.defaultSession = "plasmawayland";
-
   services.xserver.desktopManager.plasma5.enable = true;
   services.xserver.xkbOptions = "ctrl:swapcaps"; 
 
@@ -115,6 +116,14 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
+  nixpkgs.config.firefox.enablePlasmaBrowserIntegration = true;
+  environment.etc."chromium/native-messaging-hosts/org.kde.plasma.browser_integration.json".source = "${pkgs.plasma-browser-integration}/etc/chromium/native-messaging-hosts/org.kde.plasma.browser_integration.json";
+  nixpkgs.config.google-chrome.enablePlasmaBrowserIntegration = true;
+
+  # services.flatpak.enable = true;
+
+  services.qemuGuest.enable = true;
+
   users.users.joseph = {
     isNormalUser = true;
     description = "Joseph Siddall";
@@ -135,8 +144,17 @@
     ];
   };
 
+  services.transmission.enable = true;
+
+
+
   programs.steam = {
 	enable = true;
+  };
+
+  
+  programs.firejail = {
+    enable = true;
   };
 
 
@@ -151,6 +169,7 @@
     usbutils
     pciutils
     virt-manager
+    bubblewrap
     # fprintd
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
