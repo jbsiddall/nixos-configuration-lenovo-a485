@@ -17,9 +17,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.kernelModules = [ 
-	"kvm_amd"
-  ];
   # boot.kernelModules = [ 
   #   "msr" # msr needed for powertop
   #   "cpufreq_conservative"
